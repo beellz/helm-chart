@@ -1,0 +1,23 @@
+{{- if .Values.grafana.sidecar.datasources.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pyroscope-data
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: pyroscope-data
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    grafana_datasource: "1"
+data:
+  pyroscope-datasource.yaml: |-
+    apiVersion: 1
+    datasources:
+{{- if .Values.grafana.enabled }}
+    - name: pyroscope-data
+      type: pyroscope-data
+      access: proxy
+      url: http://{{(include "pyroscope.fullname" .)}}:{{ .Values.service.port }}
+      version: 1
+{{- end }}
+{{- end }}
