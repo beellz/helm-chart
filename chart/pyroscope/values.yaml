@@ -202,7 +202,7 @@ grafana:
   ##
   defaultDashboardsEnabled: true
 
-  adminPassword: prom-operator
+  adminPassword: pyroscope
 
   ingress:
     ## If true, Grafana Ingress will be created
@@ -267,8 +267,9 @@ grafana:
       ## ref: https://git.io/fjaBS
       createPrometheusReplicasDatasources: false
       label: grafana_datasource
-
-  extraConfigmapMounts: []
+  
+  
+      extraConfigmapMounts: []
   # - name: certs-configmap
   #   mountPath: /etc/grafana/ssl/
   #   configMap: certs-configmap
@@ -324,7 +325,7 @@ grafana:
     #   replacement: $1
     #   action: replace
 
-
+  plugins: pyroscope-datasource 
 
 
 
