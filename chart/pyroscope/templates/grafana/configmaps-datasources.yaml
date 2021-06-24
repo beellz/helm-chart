@@ -1,23 +1,25 @@
-{{- if .Values.grafana.sidecar.datasources.enabled }}
+{{- if or (and .Values.grafana.enabled .Values.grafana.sidecar.datasources.enabled) .Values.grafana.forceDeployDatasources }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: pyroscope-datasource
-  namespace: {{ .Release.Namespace }}
+  name: {{ include "pyroscope.fullname" . }}-grafana-datasource
+{{- if .Values.grafana.sidecar.datasources.annotations }}
+  annotations:
+{{ toYaml .Values.grafana.sidecar.datasources.annotations | indent 4 }}
+{{- end }}
   labels:
-    app: pyroscope-datasource
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-    grafana_datasource: "1"
+    {{ $.Values.grafana.sidecar.datasources.label }}: "1"
+    app: {{ include "pyroscope.fullname" $ }}-grafana
+    {{- include "pyroscope.labels" $ | nindent 4 }}
 data:
   pyroscope-datasource.yaml: |-
     apiVersion: 1
     datasources:
-{{- if .Values.grafana.enabled }}
-    - name: pyroscope-datasource
+{{- if .Values.grafana.sidecar.datasources.defaultDatasourceEnabled }}
+    - name: Pyroscope
       type: pyroscope-datasource
-      access: proxy
-      url: http://{{(include "pyroscope.fullname" .)}}:{{ .Values.service.port }}
-      version: 1
+      isDefault: true
+      jsonData:
+        path: http://{{ include "pyroscope.fullname" . }}:{{ .Values.service.port }}
 {{- end }}
 {{- end }}
